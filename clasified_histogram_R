@@ -1,0 +1,31 @@
+install.packages("ggplot2")
+install.packages("ggsci")
+library(ggsci)
+library(ggplot2)
+
+# GOSEの層別 == 例
+g <- ggplot(Dataset, aes(x = gose, fill = Dataset))
+g <- g + geom_histogram(aes(y = ..density..), binwidth = 0.47, position = "dodge",
+alpha = 0.9, boundary=0.03) + theme(legend.position="top") +
+labs(x="GOS-E", y = "Proportion") +
+scale_x_continuous(breaks=c(1,2,3,4,5,6,7,8))
+g <- g + scale_fill_npg()
+plot(g)
+ggsave(file = "Figure2_1.png", plot = g, dpi = 600, width = 4, height = 3.5)
+	>> EZRではうまく保存できず。
+
+# outcomeの層別 == 例
+p <- ggplot(Dataset, aes(x = Outcome, fill = Dataset))
+p <- p + geom_histogram(aes(y = ..density..), binwidth = 0.47, position = "dodge",
+alpha = 0.9, boundary=0.03) +theme(legend.position="top")
++ scale_x_discrete("Outcome")
+plot(p)
+
+dev.print(png, 
+  filename="F:/脳外・勉強会・学会演題・論文/臨床研究_ongoing/2_予後予測モデル作製実験/BTPPP-retro論文向け解析/統計解析EZR/Figure 2-2.png",
+   width=7, height=7, pointsize=12, units="in", res=300)
+	>> これで保存した。
+
+グラフの色組み合わせは以下を参照：
+Scientific Journal and Sci-Fi Themed Color Palettes for ggplot2
+https://cran.r-project.org/web/packages/ggsci/vignettes/ggsci.html#npg
