@@ -1,0 +1,8 @@
+# RでBox-cox変換
+
+library(car)
+ptf.APTT <- powerTransform(Dataset$APTT)
+# 確認
+ptf.APTT$lambda
+bc_APTT <- bcPower(Dataset$APTT, ptf.APTT$lambda)
+Dataset$bc_APTT <- (bc_APTT)
