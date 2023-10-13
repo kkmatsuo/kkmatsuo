@@ -1,0 +1,6 @@
+# RでANCOVA
+
+model <- lm(log_Ddimer ~ bc_EFNS_GCS + bc_Rotterdam + log_age + massive_contusin_or_ICH + basal_Fx + anticoagulation_drug, data = subset(Dataset, time5class == 3)) %>%
+  car::Anova(type="II")
+
+model
