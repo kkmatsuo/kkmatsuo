@@ -1,0 +1,22 @@
+# ライブラリの読み込み
+library(ggplot2)
+library(tidyr)
+library(RColorBrewer)
+
+# anticoagulation_drugが欠損していない行を抽出
+filtered_data <- drop_na(Dataset, anticoagulation_drug)
+
+# ggplotでグラフを作成
+# geom_errorbarのfun.dataにmean_seを指定することで、標準誤差が表示されます。
+gg1 <- ggplot(filtered_data, aes(x = factor(time5class), y = APTT, fill = factor(anticoagulation_drug))) +
+  geom_bar(stat = "summary", fun = "mean", position = "dodge", color = "black", alpha = 0.8) +
+  geom_errorbar(stat = "summary", fun.data = "mean_se", position = position_dodge(width = 0.9), width = 0.2) +
+  labs(x = "受傷後経過時間カテゴリ", y = "APTT", fill = "抗凝固薬内服") +
+  scale_x_discrete(labels = c("0-1h", "1-2h", "2-6h", "6-16h", "16-24h")) +
+  scale_fill_manual(values = c("0" = brewer.pal(4, "Dark2")[1], "1" = brewer.pal(4, "Dark2")[2]),
+  name = "抗凝固薬内服", labels = c("0" = "なし", "1" = "あり")) +
+  theme_minimal()
+gg1
+
+ggsave("F:/研究/ThinkFAST_サブ解析/EZR解析/ggplot_graph/APTT_AC_5time.png", gg1, dpi = 300, width = 8, height = 6, units = "in")
+# これで、保存もできた.
