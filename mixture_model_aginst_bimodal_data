@@ -1,0 +1,26 @@
+
+library(mixtools)
+
+# 二峰性分布を示すデータの正規分布への近似手法
+# ミックスチュアモデルを推定
+model <- normalmixEM(Dataset$gcs_total)
+# 推定されたパラメータを表示
+summary(model)
+
+# 各成分の平均と標準偏差を取得
+mean_component1 <- model$mu[1]
+sd_component1 <- sqrt(model$sigma[1])
+
+mean_component2 <- model$mu[2]
+sd_component2 <- sqrt(model$sigma[2])
+
+# 各成分の密度関数を計算
+density_component1 <- dnorm(Dataset$gcs_total, mean = mean_component1, sd = sd_component1)
+density_component2 <- dnorm(Dataset$gcs_total, mean = mean_component2, sd = sd_component2)
+
+# 各成分の寄与を考慮して元データを正規分布に変換
+GCS_approximated <- (model$lambda[1] * density_component1) + (model$lambda[2] * density_component2)
+
+print(GCS_approximated)
+
+hist(GCS_approximated, probability = TRUE, col = "lightblue", main = "Mixture Model and Normal Approximation")
