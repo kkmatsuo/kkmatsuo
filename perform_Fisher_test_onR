@@ -1,0 +1,30 @@
+# Fisher's Exact Testと結果のまとめを行う関数
+perform_fisher_test <- function(dataset, variable, group_col) {
+  table <- table(dataset[[group_col]], dataset[[variable]])
+  
+  res <- fisher.test(table)
+  
+  group.names <- c(paste(group_col, "=FALSE"), paste(group_col, "=TRUE"))
+  
+  results <- data.frame(
+    Factor = variable,
+    PValue = res$p.value,
+    CI_Lower = ifelse(!is.null(res$conf.int), res$conf.int[1], NA),
+    CI_Upper = ifelse(!is.null(res$conf.int), res$conf.int[2], NA)
+  )
+  
+  return(results)
+}
+
+# 対象となるバイナリ因子のリスト
+binary_factors <- c("male_sex", "Anteroior", "Posterior", "anisocoria", "simple_technique", 
+                    "CPA_onset", "add_craniotomy", "add_EVD", "GCS6achieve")
+
+# 各バイナリ因子に対して関数を実行し、リストに名前を付ける
+fisher_results_list <- lapply(binary_factors, perform_fisher_test, dataset = Dataset, group_col = "group0_on_cluster5")
+
+# 結果をデータフレームとして結合
+fisher_results_df <- do.call(rbind, fisher_results_list)
+
+# 結果を表示
+print(fisher_results_df)
