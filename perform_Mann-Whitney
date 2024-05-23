@@ -1,0 +1,52 @@
+# Mann-Whitney U検定と結果のまとめを行う関数
+perform_mann_whitney <- function(dataset, variable, group_col) {
+  boxplot(formula(paste(variable, "~ factor(", group_col, ")")), 
+          ylab = variable, xlab = group_col, data = dataset)
+  
+  res <- wilcox.test(formula(paste(variable, "~ factor(", group_col, ")")), 
+                     alternative = "two.sided", data = dataset, exact = FALSE)
+  
+  group.names <- c(paste(group_col, "=FALSE"), paste(group_col, "=TRUE"))
+  
+  group.min <- c(with(dataset, min(get(variable)[get(group_col) == 'FALSE'], na.rm = TRUE)),
+                 with(dataset, min(get(variable)[get(group_col) == 'TRUE'], na.rm = TRUE)))
+  
+  group.1Q <- c(with(dataset, quantile(get(variable)[get(group_col) == 'FALSE'], 0.25, na.rm = TRUE)),
+                with(dataset, quantile(get(variable)[get(group_col) == 'TRUE'], 0.25, na.rm = TRUE)))
+  
+  group.median <- c(with(dataset, median(get(variable)[get(group_col) == 'FALSE'], na.rm = TRUE)),
+                    with(dataset, median(get(variable)[get(group_col) == 'TRUE'], na.rm = TRUE)))
+  
+  group.3Q <- c(with(dataset, quantile(get(variable)[get(group_col) == 'FALSE'], 0.75, na.rm = TRUE)),
+                with(dataset, quantile(get(variable)[get(group_col) == 'TRUE'], 0.75, na.rm = TRUE)))
+  
+  group.max <- c(with(dataset, max(get(variable)[get(group_col) == 'FALSE'], na.rm = TRUE)),
+                 with(dataset, max(get(variable)[get(group_col) == 'TRUE'], na.rm = TRUE)))
+  
+  group.p <- c(signif(res$p.value, digits = 3), "")
+  
+  mannwhitney.table <- data.frame(Minimum = group.min, `25%` = group.1Q, 
+                                  Median = group.median, `75%` = group.3Q, 
+                                  Maximum = group.max, p.value = group.p)
+  
+  rownames(mannwhitney.table) <- group.names
+  colnames(mannwhitney.table) <- gettextRcmdr(colnames(mannwhitney.table))
+  
+  return(mannwhitney.table)
+}
+
+# 対象となる変数のリスト
+variables <- c("age", "An_location_number", "BS", "BS_K_ratio", "coil_length", 
+               "d_h_ratio", "d_n_ratio", "DAC", "dome_1", "dome_2", "GC_F", 
+               "GCS6day", "GCS_e", "GCS_m", "GCS_v", "GCS_total", "height", 
+               "IVR_duration", "K", "length_of_Stay", "mRS_discharge", "neck", 
+               "O2D", "pupil", "VER", "WFNS")
+
+# ウィンドウ設定
+windows(width = 7, height = 7); par(lwd = 1, las = 1, family = "sans", cex = 1, mgp = c(3.0, 1, 0))
+
+# 各変数に対して関数を実行し、リストに名前を付ける
+results_list <- setNames(lapply(variables, perform_mann_whitney, dataset = Dataset, group_col = "group0_on_cluster5"), variables)
+
+# 結果を表示
+results_list
